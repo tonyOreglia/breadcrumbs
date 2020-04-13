@@ -1,0 +1,27 @@
+version: '3.3'
+services:
+    flyway:
+        image: flyway/flyway
+        command: -url=jdbc:postgresql://postgis:5432/breadcrumbs -user=toreglia -password=anthony -connectRetries=10 migrate info
+        volumes:
+            - ./migration/sql:/flyway/sql
+        links:
+            - postgis
+        depends_on:
+            - postgis
+    postgis:
+        image: postgis/postgis
+        container_name: postgis
+        environment:
+            - POSTGRES_USER=toreglia
+            - POSTGRES_PASSWORD=anthony
+            - ALLOW_IP_RANGE=0.0.0.0/0
+        ports:
+            - '5432:5432'
+        volumes:
+            - 'pg_data:/var/lib/postgresql'
+            - ./migration/bin/init/init.sh:/docker-entrypoint-initdb.d/init.sh
+        restart: always
+
+volumes:
+    pg_data:
