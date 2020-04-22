@@ -29,7 +29,7 @@ func TestSaveNote(t *testing.T) {
 	defer db.Close()
 	mock.ExpectBegin()
 	mock.ExpectExec("INSERT INTO notes").WithArgs(testNote).WillReturnResult(sqlmock.NewResult(1, 1))
-	mock.ExpectExec("INSERT INTO breadcrumbs").WithArgs(testNote).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(`INSERT INTO breadcrumbs \(data_type, data_id, geog\) VALUES \( 'notes', \(SELECT id from notes WHERE note=\$1\), 'SRID=4326;POINT\(100.000010 200.000020\)'\)`).WithArgs(testNote).WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()
 
 	err := DBStore.SaveNote(testNote, testLat, testLon)
