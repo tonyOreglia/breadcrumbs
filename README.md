@@ -1,41 +1,50 @@
-# BreadCrumbs Server 
-A RESTful HTTP server which allows users to generate and receive location based notes.
+## BreadCrumbs Application 
+This server is intended to support an application that Josh Kempy and I envisioned called BreadCrumbs. BreadCrumbs is an example of next generation social networking which centers around dynamic geography based interaction.
 
-The server will validate and attempt to fix mobile numbers before storing. 
-Upon storing a batch of numbers, the service will return some basic information about the numbers stored.
+BreadCrumbs allow users to create and find location based data. This data could be anything; from a message, image, or video to a virtual restaurant rating, augmented reality footage, or advertisement. The user need not be connected to any other user in the traditional sense of social networking. No friendships or network needed. The only connection needed is location; irrespective of time. To receive data, the user only needs to be in the same place the data was dropped. Thus the user stumbles upon past messages as they explore the real world. 
 
-## The App 
-This server is intended to support an application that Josh Kempy and I envisioned. The app would be an implementation of next generation social networking – dynamic geo based interaction.
+# BreadCrumbs Server Tech Stack
+A RESTful HTTP server builtt in Golang which allows users to generate and receive location based messages. A PostgreSQL database is run in a Docker container. [PostGIS](https://postgis.net/) is used for storage and efficient retrieval of spatial data. 
 
-The idea would allow users to generate and receive location based data. The user need not be connected to another user to recieve data -- only to be in the place the data was dropped. This data could be as simple as a note, image, or video. As a first step, I am planning to build an API to support such an app.
+* [Go Programming Language](https://golang.org/): Go is an open source programming language that makes it easy to build simple, reliable, and efficient software.
+* [Docker](https://www.docker.com/): Docker uses OS-level virtualization to deliver software in packages called containers.
+* [PostgreSQL](https://www.postgresql.org/): PostgreSQL is a powerful, open source object-relational database system.
+* [PostGIS](https://postgis.net/): A spatial database extender for PostgreSQL
+* [Flyway](https://flywaydb.org/): Flyway is an open-source database migration tool.
+* [modd](https://github.com/cortesi/modd): A flexible developer tool that runs processes and responds to filesystem changes
+
 
 ## Dependencies 
  - [Docker](https://www.docker.com/)
- - [Flyway](https://flywaydb.org/)
  - [Golang >1.11](https://github.com/golang/go/wiki/Modules)
+
+## Dev Dependencies
  - [modd](https://github.com/cortesi/modd) 
- - [psql]
 
 ### Developing on Mac
 
 #### Install Dependencies
   1. Install [Docker for Mac](https://docs.docker.com/docker-for-mac/install/)
-  1. Install modd 
-  `$ brew install modd`
   1. Install [Go](https://golang.org/doc/install)
+  1. Install modd  `$ brew install modd`
 
 #### Initialize DB and Tables
 
-Start Postgres, initialize DB and create tables
+Start Postgres container & initialize tables
 ```
 $ docker-compose up -d
 ```
 
+When running locally, connect to Postgres at `jdbc:postgresql://postgis:5432/breadcrumbs` with the password and username specified in config
 
-Connect to the Postgres DB using psql
+To stop Postgres 
 ```
-$ docker exec -it postgis /bin/bash -c "PGPASSWORD=<password> psql -d <db_name> -U <username> -h localhost"
+$ docker-compose stop
 ```
 
-
+#### To Run the Server Locally
+This will run the server locally and live restart when any changes are saved
+```
+$ modd
+```
 
