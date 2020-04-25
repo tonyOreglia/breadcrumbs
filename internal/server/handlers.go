@@ -12,10 +12,22 @@ import (
 	"github.com/golang/gddo/httputil/header"
 )
 
+// TO DO: refactor this by embedding Location
+// TO DO: refactor this by adding proper json property namees (lowercase)
 type Note struct {
     Note string
 	Latitude float64
 	Longitude float64
+}
+
+type Location struct {
+    Latitude float64  `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+}
+
+type Area struct {
+    Location Location  `json:"location"`
+    RadiusInMeters int `json:"radius_in_meters"`
 }
 
 // process a CSV payload of mobile numbers
@@ -33,6 +45,28 @@ func (s *Server) storeNoteHandler(w http.ResponseWriter, r *http.Request) {
         return
 	}
 	s.db.SaveNote(n.Note, n.Latitude, n.Longitude)
+}
+
+func (s *Server) getNotesHandler(w http.ResponseWriter, r *http.Request) {
+	var a Area
+	err := decodeJSONBody(w, r, &a)
+    if err != nil {
+        var mr *malformedRequest
+        if errors.As(err, &mr) {
+            http.Error(w, mr.msg, mr.status)
+        } else {
+            log.Println(err.Error())
+            http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+        }
+        return
+	}
+    err, notes := s.db.RetrieveNotes(a.Location.Latitude, a.Location.Longitude, a.RadiusInMeters)
+    if err != nil {
+        log.Println(err.Error())
+        http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+    }
+    w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	json.NewEncoder(w).Encode(notes)
 }
 
 type malformedRequest struct {

@@ -38,3 +38,19 @@ func TestSaveNote(t *testing.T) {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
 }
+
+func TestRetrieveNotes(t *testing.T) {
+	testRadius := 123
+	testLat := 100.00001
+	testLon := 200.00002
+	db, DBStore, mock := PrepareMockStore(t)
+	defer db.Close()
+	mock.ExpectQuery(`
+		SELECT n.note, ST_X\(b.geog::geometry\), ST_Y\(geog::geometry\) FROM breadcrumbs as b LEFT JOIN notes as n ON b.data_id = n.id WHERE ST_DWithin\(b.geog, ST_MakePoint\(100.000010, 200.000020\), \$1\)
+		`).WithArgs(testRadius)
+	err, _ := DBStore.RetrieveNotes(testLat, testLon, testRadius)
+	require.NoError(t, err)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+}

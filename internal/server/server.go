@@ -26,6 +26,7 @@ func New() *Server {
 	server.db = store.New("postgresql://toreglia:anthony@localhost/breadcrumbs?sslmode=disable", 2)
 	server.r = mux.NewRouter()
 	server.r.HandleFunc("/note", server.storeNoteHandler).Methods("POST")
+	server.r.HandleFunc("/getNotes", server.getNotesHandler).Methods("POST")
 	return server
 }
 
