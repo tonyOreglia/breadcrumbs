@@ -9,31 +9,17 @@ import (
 	"encoding/json"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/golang/gddo/httputil/header"
+    "github.com/golang/gddo/httputil/header"
 )
-
-// TO DO: refactor this by embedding Location
-// TO DO: refactor this by adding proper json property namees (lowercase)
-type Note struct {
-    Note string
-	Latitude float64
-	Longitude float64
-}
-
-type Location struct {
-    Latitude float64  `json:"latitude"`
-	Longitude float64 `json:"longitude"`
-}
-
-type Area struct {
-    Location Location  `json:"location"`
-    RadiusInMeters int `json:"radius_in_meters"`
-}
 
 // process a CSV payload of mobile numbers
 func (s *Server) storeNoteHandler(w http.ResponseWriter, r *http.Request) {
-	var n Note
-	err := decodeJSONBody(w, r, &n)
+	var requestBody struct {
+        Message string     `json:"message"`
+        Latitude float64   `json:"latitude"`
+        Longitude float64  `json:"longitude"`
+    }
+	err := decodeJSONBody(w, r, &requestBody)
     if err != nil {
         var mr *malformedRequest
         if errors.As(err, &mr) {
@@ -44,12 +30,16 @@ func (s *Server) storeNoteHandler(w http.ResponseWriter, r *http.Request) {
         }
         return
 	}
-	s.db.SaveNote(n.Note, n.Latitude, n.Longitude)
+	s.db.SaveNote(requestBody.Message, requestBody.Latitude, requestBody.Longitude)
 }
 
 func (s *Server) getNotesHandler(w http.ResponseWriter, r *http.Request) {
-	var a Area
-	err := decodeJSONBody(w, r, &a)
+    var requestBody struct {
+        RadiusInMeters int   `json:"radius_in_meters"`
+        Latitude float64        `json:"latitude"`
+        Longitude float64       `json:"longitude"`
+    }
+	err := decodeJSONBody(w, r, &requestBody)
     if err != nil {
         var mr *malformedRequest
         if errors.As(err, &mr) {
@@ -60,7 +50,7 @@ func (s *Server) getNotesHandler(w http.ResponseWriter, r *http.Request) {
         }
         return
 	}
-    err, notes := s.db.RetrieveNotes(a.Location.Latitude, a.Location.Longitude, a.RadiusInMeters)
+    err, notes := s.db.RetrieveNotes(requestBody.RadiusInMeters, requestBody.Latitude, requestBody.Longitude)
     if err != nil {
         log.Println(err.Error())
         http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
