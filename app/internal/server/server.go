@@ -22,8 +22,16 @@ type Server struct {
 // New returns HTTP Server configured for localhost port 80
 func New() *Server {
 	log.Info("Starting server...")
+	// jdbc:postgresql://postgis:5432/breadcrumbs
 	server := new(Server)
-	server.db = store.New("postgresql://toreglia:anthony@localhost/breadcrumbs?sslmode=disable", 2)
+	server.db = store.New(store.NewStoreParams {
+		Host: "postgis",
+		Port: 5432,
+		User: "toreglia",
+		Password: "anthony",
+		DBname: "breadcrumbs", 
+		MaxDBConns: 2,
+	})
 	server.r = mux.NewRouter()
 	server.r.HandleFunc("/note", server.storeNoteHandler).Methods("POST")
 	server.r.HandleFunc("/getNotes", server.getNotesHandler).Methods("POST")
