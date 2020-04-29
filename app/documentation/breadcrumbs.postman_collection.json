@@ -1,0 +1,68 @@
+{
+	"info": {
+		"_postman_id": "3ab916f3-e8f5-4e56-ad00-42ba0a25d6eb",
+		"name": "breadcrumbs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Note",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"message\": \"Hello World!!\",\n    \"longitude\": 9.156324,\n    \"latitude\": 38.7153423\n}"
+				},
+				"url": {
+					"raw": "http://localhost:80/note",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"note"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Notes",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"latitude\": 38.7153,\n    \"longitude\": 9.1566,\n    \"radius_in_meters\": 1000\n}"
+				},
+				"url": {
+					"raw": "http://localhost:80/getNotes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "80",
+					"path": [
+						"getNotes"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
