@@ -25,26 +25,23 @@ A RESTful HTTP server builtt in Golang which allows users to generate and receiv
 
 #### Install Dependencies
   1. Install [Docker for Mac](https://docs.docker.com/docker-for-mac/install/)
-  1. Install [Go](https://golang.org/doc/install)
-  1. Install modd  `$ brew install modd`
 
-#### Initialize DB and Tables
+#### Run Locally in Development Mode
 
-Start Postgres container & initialize tables
 ```
-$ docker-compose up -d
+$ make run-dev
 ```
 
-When running locally, connect to Postgres at `jdbc:postgresql://postgis:5432/breadcrumbs` with the password and username specified in config
+#### Run with Production Build
 
-To stop Postgres 
 ```
-$ docker-compose stop
+$ make rur-prod
 ```
 
-#### To Run the Server Locally
-This will run the server locally and live restart when any changes are saved
+
+#### Stop the Servce
+
 ```
-$ modd
+$ make stop
 ```
 

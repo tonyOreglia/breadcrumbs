@@ -26,6 +26,7 @@ func New() *Server {
 	server := new(Server)
 	server.db = store.New(store.NewStoreParams {
 		Host: "postgis",
+		// Host: "localhost",
 		Port: 5432,
 		User: "toreglia",
 		Password: "anthony",

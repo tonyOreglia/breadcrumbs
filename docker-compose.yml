@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3.4'
 services:
     postgis:
         image: postgis/postgis
@@ -24,18 +24,21 @@ services:
         depends_on:
             - postgis
     app:
+        environment:
+            - ENV=production
         build:
             context: ./app
+            target: prod
+            args:
+                environment: production
         volumes:
-            - .app/:/go/src/app
+            - ./app/:/go/src/app
         ports:
             - "80:80"
         links:
             - postgis
         depends_on:
             - postgis
-        environment:
-            WAIT_HOSTS: postgis:5432
 
 volumes:
     pg_data:

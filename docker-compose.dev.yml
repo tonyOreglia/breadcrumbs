@@ -1,0 +1,18 @@
+version: '3.4'
+services:
+    app:
+        build:
+            context: ./app
+            target: builder
+            args:
+                environment: development
+        command: CompileDaemon -log-prefix=false -build="go build ./cmd/breadcrumbs" -command="./breadcrumbs"
+        ports:
+            - "80:80"
+        links:
+            - postgis
+        depends_on:
+            - postgis
+
+volumes:
+    pg_data:
