@@ -24,11 +24,11 @@ func (s *Store) Close() {
 }
 
 type NewStoreParams struct {
-	Host string
-	Port int
-	User string
-	Password string
-	DBname string
+	Host       string
+	Port       int
+	User       string
+	Password   string
+	DBname     string
 	MaxDBConns int
 }
 
@@ -36,13 +36,13 @@ type NewStoreParams struct {
 func New(params NewStoreParams) *Store {
 	store := &Store{}
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-    	"password=%s dbname=%s sslmode=disable",
-    	params.Host, params.Port, params.User, params.Password, params.DBname)
+		"password=%s dbname=%s sslmode=disable",
+		params.Host, params.Port, params.User, params.Password, params.DBname)
 	var err error
 	store.DB, err = sqlx.Connect("postgres", psqlInfo)
 	if err != nil {
-        log.Fatalln(err)
-    }
+		log.Fatalln(err)
+	}
 	store.DB.SetMaxOpenConns(params.MaxDBConns)
 	return store
 }

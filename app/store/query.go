@@ -36,8 +36,8 @@ func (s *Store) SaveNote(note string, latitude float64, longitude float64) error
 }
 
 type Note struct {
-	Note string         `json:"note" db:"note"`
-	Latitude float64  `json:"latitude" db:"st_x"`
+	Note      string  `json:"note" db:"note"`
+	Latitude  float64 `json:"latitude" db:"st_x"`
 	Longitude float64 `json:"longitude" db:"st_y"`
 }
 

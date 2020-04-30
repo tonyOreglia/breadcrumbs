@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/tonyOreglia/breadcrumbs/store"
 	log "github.com/sirupsen/logrus"
+	"github.com/tonyOreglia/breadcrumbs/store"
 )
 
 var (
@@ -24,13 +24,13 @@ func New() *Server {
 	log.Info("Starting server...")
 	// jdbc:postgresql://postgis:5432/breadcrumbs
 	server := new(Server)
-	server.db = store.New(store.NewStoreParams {
+	server.db = store.New(store.NewStoreParams{
 		Host: "postgis",
 		// Host: "localhost",
-		Port: 5432,
-		User: "toreglia",
-		Password: "anthony",
-		DBname: "breadcrumbs", 
+		Port:       5432,
+		User:       "toreglia",
+		Password:   "anthony",
+		DBname:     "breadcrumbs",
 		MaxDBConns: 2,
 	})
 	server.r = mux.NewRouter()
