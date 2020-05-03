@@ -9,8 +9,14 @@ run-dev: build-dev
 build-prod:
 	docker-compose build
 
-run-prod: build-prod:
+run-prod: build-prod
 	docker-compose up -d
 
 stop:
 	docker-compose stop
+
+tail-server-logs: 
+	docker logs -f breadcrumbs_app_1
+
+format-go-files:
+	gofmt -w $(current_dir)/app
