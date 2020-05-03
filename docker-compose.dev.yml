@@ -6,7 +6,15 @@ services:
             target: builder
             args:
                 environment: development
-        command: CompileDaemon -log-prefix=false -build="go build ./cmd/breadcrumbs" -command="./breadcrumbs"
+        environment:
+            - DB_USER=${DB_USER}
+            - DB_PW=${DB_PW}
+            - DB_NAME=${DB_NAME}
+            - DB_PORT=${DB_PORT}
+            - DB_HOST=${DB_HOST}
+            - MAX_DB_CONNECTIONS=${MAX_DB_CONNECTIONS}
+        volumes:
+            - ./app:/app
         ports:
             - "80:80"
         links:

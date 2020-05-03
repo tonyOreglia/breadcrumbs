@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 	"github.com/tonyOreglia/breadcrumbs/store"
+	"github.com/tonyOreglia/breadcrumbs/config"
 )
 
 var (
@@ -20,18 +21,18 @@ type Server struct {
 }
 
 // New returns HTTP Server configured for localhost port 80
-func New() *Server {
-	log.Info("Starting server...")
+func New(config *config.Config) *Server {
+	log.Info("Starting server")
+	log.Info(config)
 	// jdbc:postgresql://postgis:5432/breadcrumbs
 	server := new(Server)
 	server.db = store.New(store.NewStoreParams{
-		Host: "postgis",
-		// Host: "localhost",
-		Port:       5432,
-		User:       "toreglia",
-		Password:   "anthony",
-		DBname:     "breadcrumbs",
-		MaxDBConns: 2,
+		Host:       config.DBHost,
+		Port:       config.DBPort,
+		User:       config.DBUser,
+		Password:   config.DBPassword,
+		DBname:     config.DBName,
+		MaxDBConns: config.MaxDBConns,
 	})
 	server.r = mux.NewRouter()
 	server.r.HandleFunc("/note", server.storeNoteHandler).Methods("POST")

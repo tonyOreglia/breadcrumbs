@@ -10,5 +10,5 @@ CREATE TABLE IF NOT EXISTS breadcrumbs(
   geog        GEOGRAPHY(POINT, 4326)
 );
 
-GRANT ALL PRIVILEGES ON TABLE breadcrumbs TO breadcrumbs;
-GRANT ALL PRIVILEGES ON TABLE notes TO breadcrumbs;
+GRANT ALL PRIVILEGES ON TABLE breadcrumbs TO breadcrumbs_user;
+GRANT ALL PRIVILEGES ON TABLE notes TO breadcrumbs_user;

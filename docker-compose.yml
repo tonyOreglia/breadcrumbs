@@ -4,8 +4,9 @@ services:
         image: postgis/postgis
         container_name: postgis
         environment:
-            - POSTGRES_USER=toreglia
-            - POSTGRES_PASSWORD=anthony
+            - POSTGRES_USER=${DB_USER}
+            - POSTGRES_PASSWORD=${DB_PW}
+            - DB_NAME=${DB_NAME}
             - ALLOW_IP_RANGE=0.0.0.0/0
         ports:
             - '5432:5432'
@@ -16,7 +17,7 @@ services:
     flyway:
         image: flyway/flyway
         # postgres url schema: jdbc:postgresql://host:port/database
-        command: -url=jdbc:postgresql://postgis:5432/breadcrumbs -user=toreglia -password=anthony -connectRetries=10 migrate info
+        command: -url=jdbc:postgresql://postgis:${DB_PORT}/${DB_NAME} -user=${DB_USER} -password=${DB_PW} -connectRetries=10 migrate info
         volumes:
             - ./migration/sql:/flyway/sql
         links:
@@ -25,7 +26,13 @@ services:
             - postgis
     app:
         environment:
-            - ENV=production
+            - DB_USER=${DB_USER}
+            - DB_PW=${DB_PW}
+            - DB_NAME=${DB_NAME}
+            - DB_PORT=${DB_PORT}
+            - DB_HOST=${DB_HOST}
+            - MAX_DB_CONNECTIONS=${MAX_DB_CONNECTIONS}
+            - WAIT_HOSTS=postgis:5432
         build:
             context: ./app
             target: prod
@@ -39,6 +46,7 @@ services:
             - postgis
         depends_on:
             - postgis
+        command: sh -c "/wait && /app/breadcrumbs"
 
 volumes:
     pg_data:

@@ -2,13 +2,10 @@
 set -e
 
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
-    CREATE USER breadcrumbs WITH PASSWORD 'breadcrumbs';
-    CREATE DATABASE breadcrumbs;
-    GRANT ALL PRIVILEGES ON DATABASE breadcrumbs TO breadcrumbs;
+    CREATE DATABASE ${DB_NAME};
+    GRANT ALL PRIVILEGES ON DATABASE ${DB_NAME} TO ${POSTGRES_USER};
 EOSQL
 
-export PGPASSWORD=breadcrumbs
-
-psql -v ON_ERROR_STOP=1 --username "toreglia" --dbname "breadcrumbs"  <<-EOSQL
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$DB_NAME"  <<-EOSQL
     CREATE EXTENSION IF NOT EXISTS postgis;
 EOSQL
