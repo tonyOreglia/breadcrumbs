@@ -5,8 +5,8 @@ import (
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
-	"github.com/tonyOreglia/breadcrumbs/store"
 	"github.com/tonyOreglia/breadcrumbs/config"
+	"github.com/tonyOreglia/breadcrumbs/store"
 )
 
 var (
@@ -24,7 +24,6 @@ type Server struct {
 func New(config *config.Config) *Server {
 	log.Info("Starting server")
 	log.Info(config)
-	// jdbc:postgresql://postgis:5432/breadcrumbs
 	server := new(Server)
 	server.db = store.New(store.NewStoreParams{
 		Host:       config.DBHost,
@@ -36,6 +35,7 @@ func New(config *config.Config) *Server {
 	})
 	server.r = mux.NewRouter()
 	server.r.HandleFunc("/note", server.storeNoteHandler).Methods("POST")
+	server.r.HandleFunc("/notes", server.storeNotesHandler).Methods("POST")
 	server.r.HandleFunc("/getNotes", server.getNotesHandler).Methods("POST")
 	return server
 }

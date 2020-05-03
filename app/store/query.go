@@ -7,6 +7,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+type Note struct {
+	Message   string  `json:"message" db:"note"`
+	Latitude  float64 `json:"latitude" db:"st_x"`
+	Longitude float64 `json:"longitude" db:"st_y"`
+}
+
 // SaveNote stores textual data at a single point location
 func (s *Store) SaveNote(note string, latitude float64, longitude float64) error {
 	log.Infof("Saving note: '%s'", note)
@@ -22,7 +28,7 @@ func (s *Store) SaveNote(note string, latitude float64, longitude float64) error
 	}
 
 	query = fmt.Sprintf(`
-		INSERT INTO breadcrumbs (data_type, data_id, geog) VALUES ( 'notes', (SELECT id from notes WHERE note=$1), 'SRID=4326;POINT(%.6f %.6f)')
+		INSERT INTO breadcrumbs (data_type, data_id, geog) VALUES ( 'note', (SELECT id from notes WHERE note=$1), 'SRID=4326;POINT(%.6f %.6f)')
 		`, latitude, longitude)
 	_, err = txn.Exec(query, note)
 	if err != nil {
@@ -35,12 +41,6 @@ func (s *Store) SaveNote(note string, latitude float64, longitude float64) error
 	return nil
 }
 
-type Note struct {
-	Note      string  `json:"note" db:"note"`
-	Latitude  float64 `json:"latitude" db:"st_x"`
-	Longitude float64 `json:"longitude" db:"st_y"`
-}
-
 func (s *Store) RetrieveNotes(radiusInMeters int, lat float64, long float64) (error, []Note) {
 	notes := []Note{}
 	query := fmt.Sprintf(`
@@ -48,4 +48,47 @@ func (s *Store) RetrieveNotes(radiusInMeters int, lat float64, long float64) (er
 		`, lat, long)
 	s.DB.Select(&notes, query, radiusInMeters)
 	return nil, notes
+}
+
+func (s *Store) SaveNotes(notes []Note) error {
+	log.Infof("Saving %d notes", len(notes))
+	txn, err := s.DB.Begin()
+	if err != nil {
+		return err
+	}
+	defer txn.Rollback()
+
+	saveNotesQuery := "INSERT INTO notes (note) VALUES "
+	saveLocationQuery := "INSERT INTO breadcrumbs (data_type, data_id, geog) VALUES "
+	for index, note := range notes {
+		saveNotesQuery = saveNotesQuery + fmt.Sprintf("('%s')", note.Message)
+
+		saveLocationQuery = saveLocationQuery + fmt.Sprintf(
+			"( 'note', (SELECT id from notes WHERE note='%s'), 'SRID=4326;POINT(%.6f %.6f)')",
+			note.Message,
+			note.Latitude,
+			note.Longitude,
+		)
+
+		if index != (len(notes) - 1) {
+			saveNotesQuery = saveNotesQuery + ", "
+			saveLocationQuery = saveLocationQuery + ", "
+		} else {
+			saveNotesQuery = saveNotesQuery + ";"
+			saveLocationQuery = saveLocationQuery + ";"
+		}
+	}
+	_, err = txn.Exec(saveNotesQuery)
+	if err != nil {
+		return err
+	}
+	_, err = txn.Exec(saveLocationQuery)
+	if err != nil {
+		return err
+	}
+	err = txn.Commit()
+	if err != nil {
+		return err
+	}
+	return nil
 }

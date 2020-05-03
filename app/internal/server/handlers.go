@@ -10,27 +10,28 @@ import (
 
 	"github.com/golang/gddo/httputil/header"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/tonyOreglia/breadcrumbs/store"
 )
 
-// process a CSV payload of mobile numbers
 func (s *Server) storeNoteHandler(w http.ResponseWriter, r *http.Request) {
-	var requestBody struct {
-		Message   string  `json:"message"`
-		Latitude  float64 `json:"latitude"`
-		Longitude float64 `json:"longitude"`
-	}
+	var requestBody store.Note
 	err := decodeJSONBody(w, r, &requestBody)
 	if err != nil {
-		var mr *malformedRequest
-		if errors.As(err, &mr) {
-			http.Error(w, mr.msg, mr.status)
-		} else {
-			log.Println(err.Error())
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		}
+		handleDecodeJSONBodyError(err, w, r)
 		return
 	}
 	s.db.SaveNote(requestBody.Message, requestBody.Latitude, requestBody.Longitude)
+}
+
+func (s *Server) storeNotesHandler(w http.ResponseWriter, r *http.Request) {
+	var requestBody []store.Note
+	err := decodeJSONBody(w, r, &requestBody)
+	if err != nil {
+		handleDecodeJSONBodyError(err, w, r)
+		return
+	}
+	s.db.SaveNotes(requestBody)
 }
 
 func (s *Server) getNotesHandler(w http.ResponseWriter, r *http.Request) {
@@ -41,13 +42,7 @@ func (s *Server) getNotesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	err := decodeJSONBody(w, r, &requestBody)
 	if err != nil {
-		var mr *malformedRequest
-		if errors.As(err, &mr) {
-			http.Error(w, mr.msg, mr.status)
-		} else {
-			log.Println(err.Error())
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		}
+		handleDecodeJSONBodyError(err, w, r)
 		return
 	}
 	err, notes := s.db.RetrieveNotes(requestBody.RadiusInMeters, requestBody.Latitude, requestBody.Longitude)
@@ -57,6 +52,16 @@ func (s *Server) getNotesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	json.NewEncoder(w).Encode(notes)
+}
+
+func handleDecodeJSONBodyError(err error, w http.ResponseWriter, r *http.Request) {
+	var mr *malformedRequest
+	if errors.As(err, &mr) {
+		http.Error(w, mr.msg, mr.status)
+	} else {
+		log.Println(err.Error())
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
 }
 
 type malformedRequest struct {

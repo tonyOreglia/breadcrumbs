@@ -1,18 +1,18 @@
 package config
 
 import (
-	"strconv"
-	"github.com/spf13/viper"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
+	"strconv"
 )
 
 type Config struct {
-	DBHost       string
-	DBPort       int
-	DBUser       string
-	DBPassword   string
-	DBName     	 string
-	MaxDBConns   int
+	DBHost     string
+	DBPort     int
+	DBUser     string
+	DBPassword string
+	DBName     string
+	MaxDBConns int
 }
 
 func New() *Config {
@@ -37,10 +37,10 @@ func New() *Config {
 	if !ok {
 		log.Fatalf("Invalid type assertion DB_PW")
 	}
-	DBPortString, ok := viper.Get("DB_PORT").(string)
-	if !ok {
-		log.Fatalf("Invalid type assertion DB_PORT")
-	}
+	DBPortString := viper.Get("DB_PORT").(string)
+	// if !ok {
+	// 	log.Fatalf("Invalid type assertion DB_PORT")
+	// }
 	config.DBPort, err = strconv.Atoi(DBPortString)
 	if err != nil {
 		log.Fatalf("Failed to convert DBPortString to integer")
