@@ -75,7 +75,7 @@ func TestSaveNotes(t *testing.T) {
 	db, DBStore, mock := PrepareMockStore(t)
 	defer db.Close()
 	mock.ExpectBegin()
-	mock.ExpectExec(`INSERT INTO notes \(note\) VALUES \('one'\), \('two'\);`).WithArgs().WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(`INSERT INTO notes \(note\) VALUES \('one'\), \('two'\) ON CONFLICT DO NOTHING;`).WithArgs().WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectExec(
 		`INSERT INTO breadcrumbs \(data_type, data_id, geog\) VALUES 
 		\( 'note', \(SELECT id from notes WHERE note='one'\), 'SRID=4326;POINT\(100.000010 200.000020\)'\), 

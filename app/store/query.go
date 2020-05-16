@@ -21,7 +21,7 @@ func (s *Store) SaveNote(note string, latitude float64, longitude float64) error
 		return err
 	}
 	defer txn.Rollback() // The rollback will be ignored if the tx has been committed later in the function.
-	query := `INSERT INTO notes (note) VALUES ($1)`
+	query := `INSERT INTO notes (note) VALUES ($1) ON CONFLICT DO NOTHING`
 	_, err = txn.Exec(query, note)
 	if err != nil {
 		return err
@@ -74,7 +74,7 @@ func (s *Store) SaveNotes(notes []Note) error {
 			saveNotesQuery = saveNotesQuery + ", "
 			saveLocationQuery = saveLocationQuery + ", "
 		} else {
-			saveNotesQuery = saveNotesQuery + ";"
+			saveNotesQuery = saveNotesQuery + " ON CONFLICT DO NOTHING;"
 			saveLocationQuery = saveLocationQuery + ";"
 		}
 	}

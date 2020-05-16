@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/lib/pq"
 	"github.com/golang/gddo/httputil/header"
 	log "github.com/sirupsen/logrus"
 
@@ -18,17 +19,20 @@ func (s *Server) storeNoteHandler(w http.ResponseWriter, r *http.Request) {
 	var requestBody store.Note
 	err := decodeJSONBody(w, r, &requestBody)
 	if err != nil {
-		handleDecodeJSONBodyError(err, w, r)
+		handleHttpError(err, w, r)
 		return
 	}
-	s.db.SaveNote(requestBody.Message, requestBody.Latitude, requestBody.Longitude)
+	err = s.db.SaveNote(requestBody.Message, requestBody.Latitude, requestBody.Longitude)
+	if err != nil {
+		handleHttpError(err, w, r)
+	}
 }
 
 func (s *Server) storeNotesHandler(w http.ResponseWriter, r *http.Request) {
 	var requestBody []store.Note
 	err := decodeJSONBody(w, r, &requestBody)
 	if err != nil {
-		handleDecodeJSONBodyError(err, w, r)
+		handleHttpError(err, w, r)
 		return
 	}
 	s.db.SaveNotes(requestBody)
@@ -42,7 +46,7 @@ func (s *Server) getNotesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	err := decodeJSONBody(w, r, &requestBody)
 	if err != nil {
-		handleDecodeJSONBodyError(err, w, r)
+		handleHttpError(err, w, r)
 		return
 	}
 	err, notes := s.db.RetrieveNotes(requestBody.RadiusInMeters, requestBody.Latitude, requestBody.Longitude)
@@ -54,14 +58,17 @@ func (s *Server) getNotesHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(notes)
 }
 
-func handleDecodeJSONBodyError(err error, w http.ResponseWriter, r *http.Request) {
+func handleHttpError(err error, w http.ResponseWriter, r *http.Request) {
 	var mr *malformedRequest
 	if errors.As(err, &mr) {
 		http.Error(w, mr.msg, mr.status)
-	} else {
-		log.Println(err.Error())
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return;
 	}
+	if err, ok := err.(*pq.Error); ok {
+		http.Error(w, err.Message, 400)
+	}
+	log.Println(err.Error())
+	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }
 
 type malformedRequest struct {
