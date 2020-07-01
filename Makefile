@@ -15,6 +15,12 @@ run-prod: build-prod
 stop:
 	docker-compose stop
 
+drop-table:
+	docker-compose rm postgis
+
+drop-app:
+	docker-compose rm app
+
 tail-server-logs: 
 	docker logs -f breadcrumbs_app_1
 

@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/lib/pq"
 	"github.com/golang/gddo/httputil/header"
+	"github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/tonyOreglia/breadcrumbs/store"
@@ -22,7 +22,8 @@ func (s *Server) storeNoteHandler(w http.ResponseWriter, r *http.Request) {
 		handleHttpError(err, w, r)
 		return
 	}
-	err = s.db.SaveNote(requestBody.Message, requestBody.Latitude, requestBody.Longitude)
+	fmt.Println(requestBody)
+	err = s.db.SaveNote(requestBody.Message, requestBody.Latitude, requestBody.Longitude, requestBody.Altitude)
 	if err != nil {
 		handleHttpError(err, w, r)
 	}
@@ -35,10 +36,15 @@ func (s *Server) storeNotesHandler(w http.ResponseWriter, r *http.Request) {
 		handleHttpError(err, w, r)
 		return
 	}
-	s.db.SaveNotes(requestBody)
+	err = s.db.SaveNotes(requestBody)
+	if err != nil {
+		handleHttpError(err, w, r)
+		return
+	}
 }
 
 func (s *Server) getNotesHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("getNotesHandler")
 	var requestBody struct {
 		RadiusInMeters int     `json:"radius_in_meters"`
 		Latitude       float64 `json:"latitude"`
@@ -46,6 +52,7 @@ func (s *Server) getNotesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	err := decodeJSONBody(w, r, &requestBody)
 	if err != nil {
+		log.Println(err.Error())
 		handleHttpError(err, w, r)
 		return
 	}
@@ -62,7 +69,7 @@ func handleHttpError(err error, w http.ResponseWriter, r *http.Request) {
 	var mr *malformedRequest
 	if errors.As(err, &mr) {
 		http.Error(w, mr.msg, mr.status)
-		return;
+		return
 	}
 	if err, ok := err.(*pq.Error); ok {
 		http.Error(w, err.Message, 400)

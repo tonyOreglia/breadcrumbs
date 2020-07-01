@@ -34,6 +34,7 @@ RUN if [ "$environment" = "production" ]; \
     go get github.com/githubnemo/CompileDaemon; \
  fi
 
+EXPOSE 80
 ENTRYPOINT CompileDaemon -log-prefix=false -build="go build ./cmd/breadcrumbs" -command="./breadcrumbs"
 
 # final stage -- only get's here on production build

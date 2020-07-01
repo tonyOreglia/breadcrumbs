@@ -14,7 +14,7 @@ def create_notes(notes):
 
     for chunk in noteChunks:
         payload = json.dumps(chunk)
-        print('Saving ' + str(len(chunk)) + 'notes...')
+        print('Saving ' + str(len(chunk)) + ' notes...')
         response = requests.request('POST', url, headers=headers, data = payload)
         print(response.status_code)
 
