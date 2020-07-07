@@ -23,8 +23,8 @@ func PrepareMockStore(t *testing.T) (*sqlx.DB, *Store, sqlmock.Sqlmock) {
 
 func TestSaveNote(t *testing.T) {
 	message := "hello world"
-	lat := 100.00001
-	long := 200.00002
+	lat := 100.00001000001
+	long := 200.00002000001
 	alt := 100.0
 
 	db, DBStore, mock := PrepareMockStore(t)
@@ -32,7 +32,7 @@ func TestSaveNote(t *testing.T) {
 	mock.ExpectBegin()
 	mock.ExpectExec("INSERT INTO notes").WithArgs(message).WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectExec(`
-		INSERT INTO breadcrumbs \(data_type, data_id, geog\) VALUES \( 'note', \(SELECT id from notes WHERE note=\$1\), ST_SetSRID\(ST_MakePoint\(100.000010, 200.000020, 100.000000\) ,4326\)
+		INSERT INTO breadcrumbs \(data_type, data_id, geog\) VALUES \( 'note', \(SELECT id from notes WHERE note=\$1\), ST_SetSRID\(ST_MakePoint\(100.000010000010, 200.000020000010, 100.0\) ,4326\)
 		`).WithArgs(message).WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()
 
@@ -45,8 +45,8 @@ func TestSaveNote(t *testing.T) {
 
 func TestRetrieveNotes(t *testing.T) {
 	radius := 123
-	lat := 100.00001
-	long := 200.00002
+	lat := 100.00001000001
+	long := 200.00002000001
 
 	db, DBStore, mock := PrepareMockStore(t)
 	defer db.Close()
@@ -55,7 +55,7 @@ func TestRetrieveNotes(t *testing.T) {
 		AddRow("hello world", 100.000010, 200.000020, 100)
 
 	mock.ExpectQuery(`
-		SELECT n.note, ST_X\(b.geog::geometry\), ST_Y\(geog::geometry\), ST_Z\(geog::geometry\) FROM breadcrumbs as b LEFT JOIN notes as n ON b.data_id = n.id WHERE ST_DWithin\(b.geog, ST_MakePoint\(100.000010, 200.000020\), \$1\)
+		SELECT n.note, ST_X\(b.geog::geometry\), ST_Y\(geog::geometry\), ST_Z\(geog::geometry\) FROM breadcrumbs as b LEFT JOIN notes as n ON b.data_id = n.id WHERE ST_DWithin\(b.geog, ST_MakePoint\(100.000010000010, 200.000020000010\), \$1\)
 		`).WithArgs(radius).WillReturnRows(rows)
 	err, _ := DBStore.RetrieveNotes(radius, lat, long)
 	require.NoError(t, err)
@@ -68,15 +68,15 @@ func TestSaveNotes(t *testing.T) {
 	notes := []Note{
 		{
 			Message:   "one",
-			Latitude:  100.00001,
-			Longitude: 200.00002,
-			Altitude: 100.0,
+			Latitude:  100.000020000020,
+			Longitude: 200.000010000010,
+			Altitude: 100.3,
 		},
 		{
 			Message:   "two",
-			Latitude:  50.00001,
-			Longitude: 90.00002,
-			Altitude: 200.0,
+			Latitude:  50.000020000020,
+			Longitude: 90.000010000010,
+			Altitude: 200.4,
 		},
 	}
 	db, DBStore, mock := PrepareMockStore(t)
@@ -85,8 +85,8 @@ func TestSaveNotes(t *testing.T) {
 	mock.ExpectExec(`INSERT INTO notes \(note\) VALUES \('one'\), \('two'\) ON CONFLICT DO NOTHING;`).WithArgs().WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectExec(
 		`INSERT INTO breadcrumbs \(data_type, data_id, geog\) VALUES 
-		\( 'note', \(SELECT id from notes WHERE note='one'\), 'SRID=4326;POINTZ\(100.000010 200.000020 100.000000\)'\), 
-		\( 'note', \(SELECT id from notes WHERE note='two'\), 'SRID=4326;POINTZ\(50.000010 90.000020 200.000000\)'\);`).
+		\( 'note', \(SELECT id from notes WHERE note='one'\), 'SRID=4326;POINTZ\(100.000020000020 200.000010000010 100.3\)'\), 
+		\( 'note', \(SELECT id from notes WHERE note='two'\), 'SRID=4326;POINTZ\(50.000020000020 90.000010000010 200.4\)'\);`).
 		WithArgs().
 		WillReturnResult(sqlmock.NewResult(1, 1))
 

@@ -29,7 +29,7 @@ func (s *Store) SaveNote(note string, latitude float64, longitude float64, altit
 	}
 
 	query = fmt.Sprintf(`
-		INSERT INTO breadcrumbs (data_type, data_id, geog) VALUES ( 'note', (SELECT id from notes WHERE note=$1), ST_SetSRID(ST_MakePoint(%.6f, %.6f, %.6f) ,4326))
+		INSERT INTO breadcrumbs (data_type, data_id, geog) VALUES ( 'note', (SELECT id from notes WHERE note=$1), ST_SetSRID(ST_MakePoint(%.12f, %.12f, %.1f) ,4326))
 		`, latitude, longitude, altitude)
 	_, err = txn.Exec(query, note)
 	if err != nil { 
@@ -43,10 +43,10 @@ func (s *Store) SaveNote(note string, latitude float64, longitude float64, altit
 }
 
 func (s *Store) RetrieveNotes(radiusInMeters int, lat float64, long float64) (error, []Note) {
-	log.Println(fmt.Sprintf("Retrieving notes within %d meters of latitude(%.6f), longitude(%.6f)", radiusInMeters, lat, long))
+	log.Println(fmt.Sprintf("Retrieving notes within %d meters of latitude(%.12f), longitude(%.12f)", radiusInMeters, lat, long))
 	notes := []Note{}
 	query := fmt.Sprintf(`
-		SELECT n.note, ST_X(b.geog::geometry), ST_Y(geog::geometry), ST_Z(geog::geometry) FROM breadcrumbs as b LEFT JOIN notes as n ON b.data_id = n.id WHERE ST_DWithin(b.geog, ST_MakePoint(%.6f, %.6f), $1)
+		SELECT n.note, ST_X(b.geog::geometry), ST_Y(geog::geometry), ST_Z(geog::geometry) FROM breadcrumbs as b LEFT JOIN notes as n ON b.data_id = n.id WHERE ST_DWithin(b.geog, ST_MakePoint(%.12f, %.12f), $1)
 		`, lat, long)
 	err := s.DB.Select(&notes, query, radiusInMeters)
 	if err != nil {
@@ -70,7 +70,7 @@ func (s *Store) SaveNotes(notes []Note) error {
 		saveNotesQuery = saveNotesQuery + fmt.Sprintf("('%s')", note.Message)
 
 		saveLocationQuery = saveLocationQuery + fmt.Sprintf(
-			"( 'note', (SELECT id from notes WHERE note='%s'), 'SRID=4326;POINTZ(%.6f %.6f %.6f)')",
+			"( 'note', (SELECT id from notes WHERE note='%s'), 'SRID=4326;POINTZ(%.12f %.12f %.1f)')",
 			note.Message,
 			note.Latitude,
 			note.Longitude,
