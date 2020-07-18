@@ -36,7 +36,7 @@ func New(config *config.Config) *Server {
 	server.r = mux.NewRouter()
 	server.r.HandleFunc("/note", server.storeNoteHandler).Methods("POST")
 	server.r.HandleFunc("/notes", server.storeNotesHandler).Methods("POST")
-	server.r.HandleFunc("/getNotes", server.getNotesHandler).Methods("POST")
+	server.r.HandleFunc("/notes", server.getNotesHandler).Methods("GET")
 	return server
 }
 
