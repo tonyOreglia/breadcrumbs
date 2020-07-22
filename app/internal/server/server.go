@@ -5,8 +5,8 @@ import (
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
-	"github.com/tonyOreglia/breadcrumbs/config"
-	"github.com/tonyOreglia/breadcrumbs/store"
+	"github.com/tonyOreglia/breadcrumbs/app/config"
+	"github.com/tonyOreglia/breadcrumbs/app/store"
 )
 
 var (

@@ -7,13 +7,13 @@ RUN echo "Running $environment build"
 # use go modules for package management
 ENV GO111MODULE=on
 # set the working directory
-WORKDIR /app
+WORKDIR /application
 # If these haven't changed then they'll be cached
 # important as downloading these files takes time
 COPY go.mod .
 COPY go.sum .
 RUN go mod download
-COPY . .
+COPY ./app ./app
 # move the golang server files to the working directory
 # COPY . /app
 # build the app into an executable
@@ -24,26 +24,29 @@ COPY . .
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.2.1/wait /wait
 RUN chmod +x /wait
 
-# if dev build then
+RUN ls
+RUN pwd 
+RUN ls ./app/
+
 RUN if [ "$environment" = "production" ]; \
  then \
     echo "building executable for production" && \
-    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build ./cmd/breadcrumbs; \
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build ./app/cmd/breadcrumbs; \
  else \
     echo "preparing development environment"  && \
     go get github.com/githubnemo/CompileDaemon; \
  fi
 
 EXPOSE 80
-ENTRYPOINT CompileDaemon -log-prefix=false -build="go build ./cmd/breadcrumbs" -command="./breadcrumbs"
+ENTRYPOINT CompileDaemon -log-prefix=false -build="go build ./app/cmd/breadcrumbs" -command="./breadcrumbs"
 
 # final stage -- only get's here on production build
 FROM bash as prod
 RUN echo "building production image"
 # use builder to reduce final image size
 # don't need the installed packages just the final build executable
-COPY --from=builder /app/breadcrumbs /app/
+COPY --from=builder /application/breadcrumbs /
 COPY --from=builder /wait /
 # expose the port this server runs on
 EXPOSE 80
-CMD ["/app/breadcrumbs"]
+CMD ["/breadcrumbs"]

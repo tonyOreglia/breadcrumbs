@@ -26,3 +26,6 @@ tail-server-logs:
 
 format-go-files:
 	gofmt -w $(current_dir)/app
+
+test:
+	go test ./...

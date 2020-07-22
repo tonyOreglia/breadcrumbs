@@ -34,7 +34,7 @@ services:
             - MAX_DB_CONNECTIONS=${MAX_DB_CONNECTIONS}
             - WAIT_HOSTS=postgis:5432
         build:
-            context: ./app
+            context: ./
             target: prod
             args:
                 environment: production
@@ -46,7 +46,7 @@ services:
             - postgis
         depends_on:
             - postgis
-        command: sh -c "/wait && /app/breadcrumbs"
+        command: sh -c "/wait && /breadcrumbs"
 
 volumes:
     pg_data:

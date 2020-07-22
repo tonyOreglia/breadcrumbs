@@ -3,8 +3,8 @@ package main
 import (
 	log "github.com/sirupsen/logrus"
 
-	"github.com/tonyOreglia/breadcrumbs/config"
-	"github.com/tonyOreglia/breadcrumbs/internal/server"
+	"github.com/tonyOreglia/breadcrumbs/app/config"
+	"github.com/tonyOreglia/breadcrumbs/app/internal/server"
 )
 
 func main() {

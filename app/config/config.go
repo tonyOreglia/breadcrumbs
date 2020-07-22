@@ -1,9 +1,10 @@
 package config
 
 import (
+	"strconv"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"strconv"
 )
 
 type Config struct {

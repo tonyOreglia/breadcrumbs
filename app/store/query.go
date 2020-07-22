@@ -2,6 +2,7 @@ package store
 
 import (
 	"fmt"
+
 	_ "github.com/lib/pq"
 
 	log "github.com/sirupsen/logrus"

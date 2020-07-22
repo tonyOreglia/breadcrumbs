@@ -12,7 +12,7 @@ import (
 	"github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/tonyOreglia/breadcrumbs/store"
+	"github.com/tonyOreglia/breadcrumbs/app/store"
 )
 
 func (s *Server) storeNoteHandler(w http.ResponseWriter, r *http.Request) {
