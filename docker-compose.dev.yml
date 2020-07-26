@@ -15,7 +15,7 @@ services:
             - MAX_DB_CONNECTIONS=${MAX_DB_CONNECTIONS}
             - WAIT_HOSTS=postgis:5432
         volumes:
-            - ./app:/app
+            - ./app:/application/app
         ports:
             - "80:80"
         links:

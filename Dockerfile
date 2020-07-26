@@ -34,7 +34,8 @@ RUN if [ "$environment" = "production" ]; \
  fi
 
 EXPOSE 80
-## TO DO -- fix this; it's no longer successfully hot reloading on changes
+
+## example taken from https://levelup.gitconnected.com/docker-for-go-development-a27141f36ba9
 ENTRYPOINT CompileDaemon -log-prefix=false -build="go build ./app/cmd/breadcrumbs" -command="./breadcrumbs"
 
 # final stage -- only get's here on production build
