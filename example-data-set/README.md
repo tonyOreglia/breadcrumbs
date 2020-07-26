@@ -1,5 +1,5 @@
 #### Generate Test Data
-This repo contains a data set from [kaggle.com](https://www.kaggle.com/datasets). The data set contains the number of covid-19 deaths recorded in cities around the world as of May 8, 2020. This data set can be stored in the Breadcrumbs server for testing purposes. 
+This repo contains a data set from [kaggle.com](https://www.kaggle.com/datasets). This data set contains the names of cities around the world with their corresponding long/lat location.
 
 Requires
 * python3
@@ -8,7 +8,7 @@ Requires
 ```
 $ cd example-data-set
 $ pipenv shell
-$ python store-data-as-breadcrumbs.py
+$ python store-cities-as-breadcrumbs.py
 ```
 
 To exit the shell 
