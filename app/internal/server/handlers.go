@@ -65,6 +65,18 @@ func (s *Server) getNotesHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(notes)
 }
 
+func (s *Server) getAllNotesHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("getAllNotesHandler")
+	err, notes := s.db.RetrieveAllNotes()
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	json.NewEncoder(w).Encode(notes)
+}
+
+
 func handleHttpError(err error, w http.ResponseWriter, r *http.Request) {
 	var mr *malformedRequest
 	if errors.As(err, &mr) {

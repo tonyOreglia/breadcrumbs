@@ -103,3 +103,35 @@ curl --location --request POST 'http://localhost:80/getNotes' \
     "radius_in_meters": 1000
 }'
 ```
+
+# GUI Demonstration 
+## Options 
+- [react google maps](https://github.com/tomchentw/react-google-maps)
+- [mapBox](https://www.mapbox.com/pricing/)
+
+I'll try google maps mainly because it is less configurable i.e. works more easily "out of the box". I don't want to do anything fancy, just post and display points so I don't want the extra flexibility of mapBox. Both free plans are more than sufficient for my needs. 
+
+## Resources 
+- overview of react google maps and react with map box: https://www.telerik.com/blogs/maps-in-react
+
+
+## What features would the demo include? 
+- could enable anyone to drop a pin with a note as a tonycodes.com demo universal user -- and likewise people may see all notes dropped
+
+
+## What will this requires?
+- Self hosting
+  - hosting breadcrumbs as a backend on the server
+  - hosting the data generated on my small ssd
+  - allowing breadcrumbs requests / responses through the router -- can put it behind nginx similarly to the chess engine
+
+- host on cloud provider 
+  - might have to pay? 
+  - less fun 
+
+
+## Steps 
+1. Generate a google api key https://console.cloud.google.com/google/maps-apis/credentials
+2. Enable your API Key to access maps https://developers.google.com/maps/gmp-get-started#enable-api-sdk
+You are looking for "Maps Javascript API" 
+3. 

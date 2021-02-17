@@ -21,7 +21,7 @@ drop-table:
 drop-app:
 	docker-compose rm app
 
-tail-server-logs: 
+tail-server-logs:
 	docker logs -f breadcrumbs_app_1
 
 format-go-files:

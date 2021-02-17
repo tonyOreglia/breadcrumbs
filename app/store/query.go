@@ -58,6 +58,20 @@ func (s *Store) RetrieveNotes(radiusInMeters int, lat float64, long float64) (er
 	return nil, notes
 }
 
+func (s *Store) RetrieveAllNotes() (error, []Note) {
+	log.Println("Retrieving all notes")
+	notes := []Note{}
+	query := fmt.Sprintf(`
+		SELECT n.note, ST_X(b.geog::geometry), ST_Y(geog::geometry), ST_Z(geog::geometry), b.date_created_unix FROM breadcrumbs as b LEFT JOIN notes as n ON b.data_id = n.id WHERE n.note IS NOT NULL
+		`)
+	err := s.DB.Select(&notes, query)
+	if err != nil {
+		return err, notes
+	}
+	log.Println(fmt.Sprintf("Retrieve %d notes: %v: ", len(notes), notes))
+	return nil, notes
+}
+
 func (s *Store) SaveNotes(notes []Note) error {
 	log.Infof("Saving %d notes", len(notes))
 	txn, err := s.DB.Begin()
