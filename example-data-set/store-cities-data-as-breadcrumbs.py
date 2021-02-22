@@ -57,7 +57,6 @@ with open('cities.csv') as csv_file:
                     'latitude': lat(row),
                     'longitude': lon(row),
                     'altitude': -1,
-                    'date_created_unix': 1595770552
                 })
             line_count += 1
     print(f'Processed {line_count} lines.')
