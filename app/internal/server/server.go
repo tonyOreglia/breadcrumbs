@@ -11,7 +11,7 @@ import (
 
 var (
 	url  = "http://localhost"
-	port = 80
+	port = 8081
 )
 
 // Server defines a HTTP Server
@@ -20,7 +20,7 @@ type Server struct {
 	db *store.Store
 }
 
-// New returns HTTP Server configured for localhost port 80
+// New returns HTTP Server configured for localhost port 8081
 func New(config *config.Config) *Server {
 	log.Info("Starting server")
 	log.Info(config)
@@ -43,5 +43,5 @@ func New(config *config.Config) *Server {
 
 // Start starts the server
 func (s *Server) Start() error {
-	return http.ListenAndServe(":80", s.r)
+	return http.ListenAndServe(":8081", s.r)
 }

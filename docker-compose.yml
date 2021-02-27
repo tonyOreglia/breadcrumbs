@@ -41,7 +41,7 @@ services:
         volumes:
             - ./app/:/go/src/app
         ports:
-            - "80:80"
+            - "8081:8081"
         links:
             - postgis
         depends_on:

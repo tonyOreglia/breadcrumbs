@@ -33,7 +33,7 @@ A RESTful HTTP server written in Golang. This API allows users to generate and r
 $ make run-dev
 ```
 
-The server will be available on localhost port 80.
+The server will be available on localhost port 8081.
 
 #### Run with Production Build
 ```
@@ -54,7 +54,7 @@ See `example-data-set/README.md`
 If you use Postman, import the collection from `app/documentation/breadcrumbs.postman_collection.json`
 
 ## POST Create Note
-http://localhost:80/note
+http://localhost:8081/note
 ### HEADERS
 `Content-Typeapplication/json`
 
@@ -69,7 +69,7 @@ http://localhost:80/note
 
 ### Example Request - Create Note
 ```
-curl --location --request POST 'http://localhost:80/note' \
+curl --location --request POST 'http://localhost:8081/note' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "message": "Hello World!!",
@@ -79,7 +79,7 @@ curl --location --request POST 'http://localhost:80/note' \
 ```
 
 ## POST Get Notes
-http://localhost:80/getNotes
+http://localhost:8081/getNotes
 
 ### HEADERS 
 `Content-Typeapplication/json`
@@ -95,7 +95,7 @@ http://localhost:80/getNotes
 
 ### Example Request - Get Notes
 ```
-curl --location --request POST 'http://localhost:80/getNotes' \
+curl --location --request POST 'http://localhost:8081/getNotes' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "latitude": 38.7153,

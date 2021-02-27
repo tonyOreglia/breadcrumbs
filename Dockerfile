@@ -33,7 +33,7 @@ RUN if [ "$environment" = "production" ]; \
     go get github.com/githubnemo/CompileDaemon; \
  fi
 
-EXPOSE 80
+EXPOSE 8081
 
 ## example taken from https://levelup.gitconnected.com/docker-for-go-development-a27141f36ba9
 ENTRYPOINT CompileDaemon -log-prefix=false -build="go build ./app/cmd/breadcrumbs" -command="./breadcrumbs"
@@ -46,5 +46,5 @@ RUN echo "building production image"
 COPY --from=builder /application/breadcrumbs /
 COPY --from=builder /wait /
 # expose the port this server runs on
-EXPOSE 80
+EXPOSE 8081
 CMD ["/breadcrumbs"]

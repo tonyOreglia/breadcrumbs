@@ -7,7 +7,7 @@ lat_index = 1
 long_index = 2
 
 def create_notes(notes):
-    url = 'http://localhost:80/notes'
+    url = 'http://localhost:8081/notes'
     headers = {
         'Content-Type': 'application/json'
     }
