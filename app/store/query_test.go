@@ -1,6 +1,7 @@
 package store
 
 import (
+	"database/sql"
 	"testing"
 
 	"github.com/jmoiron/sqlx"
@@ -23,6 +24,10 @@ func PrepareMockStore(t *testing.T) (*sqlx.DB, *Store, sqlmock.Sqlmock) {
 
 func TestSaveNote(t *testing.T) {
 	message := "hello world"
+	name := sql.NullString{
+		String: "tony oreglia",
+		Valid: true,
+	}
 	lat := 100.00001000001
 	long := 200.00002000001
 	alt := 100.0
@@ -31,12 +36,14 @@ func TestSaveNote(t *testing.T) {
 	defer db.Close()
 	mock.ExpectBegin()
 	mock.ExpectExec("INSERT INTO notes").WithArgs(message).WillReturnResult(sqlmock.NewResult(1, 1))
+		
+	mock.ExpectQuery(`INSERT INTO bc_user \(full_name\)`).WithArgs(name).WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
 	mock.ExpectExec(`
-		INSERT INTO breadcrumbs \(data_type, data_id, geog\) VALUES \( 'note', \(SELECT id from notes WHERE note=\$1\), ST_SetSRID\(ST_MakePoint\(200.000020000010, 100.000010000010, 100.0\), 4326\)\)
-		`).WithArgs(message).WillReturnResult(sqlmock.NewResult(1, 1))
+		INSERT INTO breadcrumbs \(data_type, data_id, geog, user_id\) VALUES \( 'note', \(SELECT id from notes WHERE note=\$1\), ST_SetSRID\(ST_MakePoint\(200.000020000010, 100.000010000010, 100.0\), 4326\), \$2\)
+		`).WithArgs(message, 1).WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()
 
-	err := DBStore.SaveNote(message, lat, long, alt)
+	err := DBStore.SaveNote(message, lat, long, alt, name)
 	require.NoError(t, err)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
@@ -56,7 +63,11 @@ func TestRetrieveNotes(t *testing.T) {
 		AddRow("hello world", 100.000010, 200.000020, 100)
 
 	mock.ExpectQuery(`
-		SELECT b.id, n.note, ST_Y\(geog::geometry\), ST_X\(b.geog::geometry\), ST_Z\(geog::geometry\), b.ts FROM breadcrumbs as b LEFT JOIN notes as n ON b.data_id = n.id WHERE ST_DWithin\(b.geog, ST_MakePoint\(200.000020000010, 100.000010000010\), \$1\)
+		SELECT b.id, n.note, ST_Y\(geog::geometry\), ST_X\(b.geog::geometry\), ST_Z\(geog::geometry\), b.ts, bc_user.full_name
+		FROM breadcrumbs as b
+		LEFT JOIN notes as n ON b.data_id = n.id
+		LEFT JOIN bc_user ON bc_user.id = b.user_id
+		WHERE ST_DWithin\(b.geog, ST_MakePoint\(200.000020000010, 100.000010000010\), \$1\)
 		`).WithArgs(radius).WillReturnRows(rows)
 	err, _ := DBStore.RetrieveNotes(radius, lat, long)
 	require.NoError(t, err)
@@ -69,11 +80,15 @@ func TestRetrieveAllNotes(t *testing.T) {
 	db, DBStore, mock := PrepareMockStore(t)
 	defer db.Close()
 
-	rows := sqlmock.NewRows([]string{"note", "st_x", "st_y", "st_z"}).
-		AddRow("hello world", 100.000010, 200.000020, 100)
+	rows := sqlmock.NewRows([]string{"note", "st_x", "st_y", "st_z", "full_name"}).
+		AddRow("hello world", 100.000010, 200.000020, 100, "tony")
 
 	mock.ExpectQuery(`
-		SELECT b.id, n.note, ST_Y\(geog::geometry\), ST_X\(b.geog::geometry\), ST_Z\(geog::geometry\), b.ts FROM breadcrumbs as b LEFT JOIN notes as n ON b.data_id = n.id WHERE n.note IS NOT NULL
+		SELECT b.id, n.note, ST_Y\(geog::geometry\), ST_X\(b.geog::geometry\), ST_Z\(geog::geometry\), b.ts, bc_user.full_name
+		FROM breadcrumbs as b
+		LEFT JOIN notes as n ON b.data_id = n.id
+		LEFT JOIN bc_user ON bc_user.id = b.user_id
+		WHERE n.note IS NOT NULL
 		`).WillReturnRows(rows)
 	err, _ := DBStore.RetrieveAllNotes()
 	require.NoError(t, err)

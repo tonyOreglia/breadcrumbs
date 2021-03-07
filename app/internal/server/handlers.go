@@ -23,7 +23,7 @@ func (s *Server) storeNoteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println(requestBody)
-	err = s.db.SaveNote(requestBody.Message, requestBody.Latitude, requestBody.Longitude, requestBody.Altitude)
+	err = s.db.SaveNote(requestBody.Message, requestBody.Latitude, requestBody.Longitude, requestBody.Altitude, requestBody.UserName)
 	if err != nil {
 		handleHttpError(err, w, r)
 	}

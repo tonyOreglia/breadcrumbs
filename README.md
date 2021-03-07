@@ -134,4 +134,10 @@ I'll try google maps mainly because it is less configurable i.e. works more easi
 1. Generate a google api key https://console.cloud.google.com/google/maps-apis/credentials
 2. Enable your API Key to access maps https://developers.google.com/maps/gmp-get-started#enable-api-sdk
 You are looking for "Maps Javascript API" 
-3. 
+
+
+
+# To Do
+- [ ] attach a user to the breadcrumbs
+- [ ] implement rate limiting or some kind of authentication mechanism ... 
+- [ ] add bc's to deployment pipeline on codeship
