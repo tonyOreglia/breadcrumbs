@@ -7,36 +7,47 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/golang/gddo/httputil/header"
 	"github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
-
-	"github.com/tonyOreglia/breadcrumbs/app/store"
 )
 
+type Note struct {
+	Id 				int 	`json:"id" db:"id"`
+	Message         string  `json:"message" db:"note"`
+	Latitude        float64 `json:"latitude" db:"st_y"`
+	Longitude       float64 `json:"longitude" db:"st_x"`
+	Altitude        float64 `json:"altitude" db:"st_z"`
+	UserName		string 	`json:"userName" db:"full_name"`
+	Timestamp 		time.Time  `json:"timestamp" db:"ts"`
+}
+
 func (s *Server) storeNoteHandler(w http.ResponseWriter, r *http.Request) {
-	var requestBody store.Note
+	var requestBody Note
 	err := decodeJSONBody(w, r, &requestBody)
 	if err != nil {
 		handleHttpError(err, w, r)
 		return
 	}
 	fmt.Println(requestBody)
-	err = s.db.SaveNote(requestBody.Message, requestBody.Latitude, requestBody.Longitude, requestBody.Altitude, requestBody.UserName)
+	storeNote := transformForDb(requestBody)
+	err = s.db.SaveNote(storeNote.Message, storeNote.Latitude, storeNote.Longitude, storeNote.Altitude, storeNote.UserName)
 	if err != nil {
 		handleHttpError(err, w, r)
 	}
 }
 
 func (s *Server) storeNotesHandler(w http.ResponseWriter, r *http.Request) {
-	var requestBody []store.Note
+	var requestBody []Note
 	err := decodeJSONBody(w, r, &requestBody)
 	if err != nil {
 		handleHttpError(err, w, r)
 		return
 	}
-	err = s.db.SaveNotes(requestBody)
+	dbNotes := transformNotesForDb(requestBody)
+	err = s.db.SaveNotes(dbNotes)
 	if err != nil {
 		handleHttpError(err, w, r)
 		return
@@ -61,8 +72,9 @@ func (s *Server) getNotesHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error())
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
+	clientNotes := transformNotesForClient(notes)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	json.NewEncoder(w).Encode(notes)
+	json.NewEncoder(w).Encode(clientNotes)
 }
 
 func (s *Server) getAllNotesHandler(w http.ResponseWriter, r *http.Request) {
@@ -72,8 +84,9 @@ func (s *Server) getAllNotesHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error())
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
+	clientNotes := transformNotesForClient(notes)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	json.NewEncoder(w).Encode(notes)
+	json.NewEncoder(w).Encode(clientNotes)
 }
 
 
