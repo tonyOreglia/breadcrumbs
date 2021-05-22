@@ -62,6 +62,13 @@ $ make run-prod
 $ make stop
 ```
 
+#### Connect to postgres server with psql command line tool
+```
+$ psql -h 192.168.1.203  postgis -d breadcrumbs -U breadcrumbs_user -W
+```
+
+Get the password from local .env file
+
 #### Generate Test Data
 See `example-data-set/README.md`
 
