@@ -27,6 +27,22 @@ A RESTful HTTP server written in Golang. This API allows users to generate and r
 
 * Install [Docker Desktop](https://www.docker.com/products/docker-desktop)
 
+#### Environment Variables
+The postgres server depends on environment variables for username, password, etc. 
+
+Store these in a local .env file. 
+
+For example, the file contents may be: 
+```
+".env" [noeol] 6L, 121C                                                                          1,1           All
+DB_NAME=<db name>
+DB_USER=<db user> 
+DB_PW=<password>
+DB_PORT=5432
+DB_HOST=postgis
+MAX_DB_CONNECTIONS=2
+``` 
+
 #### Run Development Mode
 
 ```
