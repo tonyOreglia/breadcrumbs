@@ -69,6 +69,11 @@ $ psql -h 192.168.1.203  postgis -d breadcrumbs -U breadcrumbs_user -W
 
 Get the password from local .env file
 
+#### Dump gzipped Database 
+```
+$ sudo docker exec postgis pg_dump -d breadcrumbs -U breadcrumbs_user | gzip >my_db-$(date +%Y-%m-%d).tar.gz
+```
+
 #### Generate Test Data
 See `example-data-set/README.md`
 
