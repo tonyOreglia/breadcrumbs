@@ -69,10 +69,24 @@ $ psql -h 192.168.1.203  postgis -d breadcrumbs -U breadcrumbs_user -W
 
 Get the password from local .env file
 
-#### Dump gzipped Database 
+#### Migrating Data to new DB 
+Note that this is data only; the tables are setup automatically by the flyway migration script
+
+##### Dump data
 ```
-$ sudo docker exec postgis pg_dump -d breadcrumbs -U breadcrumbs_user | gzip >my_db-$(date +%Y-%m-%d).tar.gz
+$ sudo docker exec postgis pg_dump --data-only -d breadcrumbs -U breadcrumbs_user > breadcrumbs_dump.sql
 ```
+
+##### Move the date to new place 
+```
+$ scp  tony@192.168.1.203:/home/tony/dev/breadcrumbs/breadcrumbs_dump.sql ~/dev/breadcrumbs/
+```
+
+##### Load the data
+```
+$ psql -h localhost -d breadcrumbs -U breadcrumbs_user < breadcrumbs_dump.sql
+```
+
 
 #### Generate Test Data
 See `example-data-set/README.md`
