@@ -35,6 +35,9 @@ type NewStoreParams struct {
 // New returns the postgres implementation of a data store
 func New(params NewStoreParams) *Store {
 	store := &Store{}
+	log.Infof("host=%s port=%d user=%s "+
+	"password=%s dbname=%s sslmode=disable",
+	params.Host, params.Port, params.User, params.Password, params.DBname)
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		params.Host, params.Port, params.User, params.Password, params.DBname)

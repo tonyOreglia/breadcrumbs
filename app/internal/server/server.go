@@ -33,7 +33,9 @@ func New(config *config.Config) *Server {
 		DBname:     config.DBName,
 		MaxDBConns: config.MaxDBConns,
 	})
+	log.Info("Creating new router")
 	server.r = mux.NewRouter()
+	log.Info("Adding endpoint handlers")
 	server.r.HandleFunc("/note", server.storeNoteHandler).Methods("POST")
 	server.r.HandleFunc("/notes", server.storeNotesHandler).Methods("POST")
 	server.r.HandleFunc("/getNotes", server.getNotesHandler).Methods("POST")
