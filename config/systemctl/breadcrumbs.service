@@ -1,0 +1,16 @@
+[Unit]
+Description=Breadcrumbs geolocation server
+Documentation=https://tonycodes.com/buildingBreadcrumbs
+ConditionPathExists=/home/toreglia/dev/breadcrumbs
+Requires=docker.service
+After=docker.service
+
+[Service]
+User=root
+Group=docker
+WorkingDirectory=/home/toreglia/dev/breadcrumbs
+ExecStart=/usr/bin/docker-compose up
+ExecStop=/usr/bin/docker-compose down 
+
+[Install]
+WantedBy=multi-user.target
